@@ -384,8 +384,8 @@ const ContactForm = () => {
                 className="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-red-500 outline-none transition-all text-gray-900 dark:text-gray-100"
               >
                 <option value="">Select Personal Trainer</option>
-                <option value="Rajesh Kumar">Rajesh Kumar</option>
-                <option value="Priya Sharma">Priya Sharma</option>
+                <option value="Pankaj">Pankaj</option>
+                <option value="mallu">Mallu</option>
                 <option value="No Need">No Need</option>
               </select>
             </div>
@@ -417,8 +417,8 @@ const ContactForm = () => {
                 className="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-red-500 outline-none transition-all text-gray-900 dark:text-gray-100"
               >
                 <option value="">Select Instructor</option>
-                <option value="Vikram Singh">Vikram Singh</option>
-                <option value="Anjali Verma">Anjali Verma</option>
+                <option value="pankaj">Pankaj</option>
+                <option value="mallu">Mallu</option>
                 <option value="No Need">No Need</option>
               </select>
             </div>
