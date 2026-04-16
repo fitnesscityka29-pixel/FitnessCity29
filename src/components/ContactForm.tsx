@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { CreditCard, Phone, Calendar, User, Activity, AlertCircle, MapPin, Mail, Dumbbell, Clock, Users } from 'lucide-react';
 import CongratulationsPage from './CongratulationsPage';
 
 const ContactForm = () => {
   const [paymentMode, setPaymentMode] = useState('cash');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const dobRef = useRef<HTMLInputElement>(null);
+  const joiningDateRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
@@ -23,14 +25,32 @@ const ContactForm = () => {
     terms: false,
   });
 
+  const getPickerDate = (dateStr: string) => {
+    if (!dateStr || typeof dateStr !== 'string') return '';
+    const parts = dateStr.split('/');
+    if (parts.length === 3) {
+      return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+    }
+    return '';
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
+    let finalValue = value;
     const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
+
+    // Convert date picker output (YYYY-MM-DD) natively to Day/Month/Year (DD/MM/YYYY) format inside form state
+    if (type === 'date' && value) {
+      const parts = value.split('-');
+      if (parts.length === 3) {
+        finalValue = `${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+    }
 
     setFormData(prev => {
       const newData = {
         ...prev,
-        [name]: type === 'checkbox' ? checked : value,
+        [name]: type === 'checkbox' ? checked : finalValue,
       };
 
       // Automatically handle the "No Issues" logic
@@ -54,20 +74,7 @@ const ContactForm = () => {
     // Using URLSearchParams is often more reliable for Apps Script 'e.parameter'
     const params = new URLSearchParams();
     Object.entries(formData).forEach(([key, value]) => {
-      let finalValue = String(value);
-
-      // Convert native date format (YYYY-MM-DD) to Google Sheets requested format (DD/MM/YYYY)
-      if ((key === 'dob' || key === 'joiningDate') && value) {
-        const strVal = String(value);
-        if (strVal.includes('-')) {
-          const parts = strVal.split('-');
-          if (parts.length === 3) {
-            finalValue = `${parts[2]}/${parts[1]}/${parts[0]}`;
-          }
-        }
-      }
-      
-      params.append(key, finalValue);
+      params.append(key, String(value));
     });
     params.append('timestamp', currentDateTime);
 
@@ -195,14 +202,40 @@ const ContactForm = () => {
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                 <Calendar size={16} /> Date of Birth *
               </label>
-              <input 
-                type="date" 
-                name="dob"
-                value={formData.dob}
-                onChange={handleInputChange}
-                required 
-                className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-red-500 outline-none transition-all text-gray-900 dark:text-gray-100" 
-              />
+              <div className="flex gap-2 relative">
+                <input 
+                  type="text" 
+                  name="dob"
+                  value={formData.dob}
+                  onChange={handleInputChange}
+                  required 
+                  placeholder="DD/MM/YYYY"
+                  className="flex-1 w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-red-500 outline-none transition-all text-gray-900 dark:text-gray-100" 
+                />
+                <button 
+                  type="button"
+                  onClick={() => {
+                    try {
+                      dobRef.current?.showPicker();
+                    } catch (e) {
+                      dobRef.current?.focus();
+                    }
+                  }}
+                  className="flex items-center justify-center bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  title="Open Calendar"
+                >
+                  <Calendar size={24} className="text-red-500" />
+                </button>
+                <input 
+                  ref={dobRef}
+                  type="date"
+                  name="dob"
+                  value={getPickerDate(formData.dob)}
+                  onChange={handleInputChange}
+                  className="sr-only"
+                  aria-hidden="true"
+                />
+              </div>
             </div>
 
             {/* Sex */}
@@ -229,14 +262,40 @@ const ContactForm = () => {
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                 <Calendar size={16} /> Admission/Joining Date *
               </label>
-              <input 
-                type="date" 
-                name="joiningDate"
-                value={formData.joiningDate}
-                onChange={handleInputChange}
-                required 
-                className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-red-500 outline-none transition-all text-gray-900 dark:text-gray-100" 
-              />
+              <div className="flex gap-2 relative">
+                <input 
+                  type="text" 
+                  name="joiningDate"
+                  value={formData.joiningDate}
+                  onChange={handleInputChange}
+                  required 
+                  placeholder="DD/MM/YYYY"
+                  className="flex-1 w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-red-500 outline-none transition-all text-gray-900 dark:text-gray-100" 
+                />
+                <button 
+                  type="button"
+                  onClick={() => {
+                    try {
+                      joiningDateRef.current?.showPicker();
+                    } catch (e) {
+                      joiningDateRef.current?.focus();
+                    }
+                  }}
+                  className="flex items-center justify-center bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  title="Open Calendar"
+                >
+                  <Calendar size={24} className="text-red-500" />
+                </button>
+                <input 
+                  ref={joiningDateRef}
+                  type="date"
+                  name="joiningDate"
+                  value={getPickerDate(formData.joiningDate)}
+                  onChange={handleInputChange}
+                  className="sr-only"
+                  aria-hidden="true"
+                />
+              </div>
             </div>
 
             {/* Membership Type */}
