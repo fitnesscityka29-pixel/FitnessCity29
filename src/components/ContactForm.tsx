@@ -23,14 +23,32 @@ const ContactForm = () => {
     terms: false,
   });
 
+  const getSelectedDate = (dateStr: string) => {
+    if (!dateStr || typeof dateStr !== 'string') return '';
+    const parts = dateStr.split('/');
+    if (parts.length === 3) {
+      return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+    }
+    return '';
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
+    let finalValue = value;
     const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
+
+    // Convert date picker output (YYYY-MM-DD) to Day/Month/Year (DD/MM/YYYY) format
+    if (type === 'date' && value) {
+      const parts = value.split('-');
+      if (parts.length === 3) {
+        finalValue = `${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+    }
 
     setFormData(prev => {
       const newData = {
         ...prev,
-        [name]: type === 'checkbox' ? checked : value,
+        [name]: type === 'checkbox' ? checked : finalValue,
       };
 
       // Automatically handle the "No Issues" logic
@@ -182,28 +200,28 @@ const ContactForm = () => {
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                 <Calendar size={16} /> Date of Birth *
               </label>
-              <div className="relative">
+              <div className="flex gap-2">
                 <input 
                   type="text" 
                   name="dob"
                   value={formData.dob}
                   onChange={handleInputChange}
                   required 
-                  placeholder="DD/MM/YYYY or type directly"
-                  className="w-full px-4 py-3 pr-12 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-red-500 outline-none transition-all text-gray-900 dark:text-gray-100" 
+                  placeholder="DD/MM/YYYY"
+                  className="flex-1 px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-red-500 outline-none transition-all text-gray-900 dark:text-gray-100" 
                 />
-                <Calendar 
-                  size={20} 
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none" 
-                />
-                <input 
-                  type="date"
-                  name="dob"
-                  onChange={handleInputChange}
-                  className="absolute right-0 top-0 w-12 h-full opacity-0 cursor-pointer"
-                  title="Open Calendar"
-                />
+                <div className="relative flex items-center justify-center bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" title="Open Calendar">
+                  <Calendar size={24} className="text-red-500" />
+                  <input 
+                    type="date"
+                    name="dob"
+                    value={getSelectedDate(formData.dob)}
+                    onChange={handleInputChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                </div>
               </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Format: Day / Month / Year</p>
             </div>
 
             {/* Sex */}
@@ -230,28 +248,28 @@ const ContactForm = () => {
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                 <Calendar size={16} /> Admission/Joining Date *
               </label>
-              <div className="relative">
+              <div className="flex gap-2">
                 <input 
                   type="text" 
                   name="joiningDate"
                   value={formData.joiningDate}
                   onChange={handleInputChange}
                   required 
-                  placeholder="DD/MM/YYYY or type directly"
-                  className="w-full px-4 py-3 pr-12 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-red-500 outline-none transition-all text-gray-900 dark:text-gray-100" 
+                  placeholder="DD/MM/YYYY"
+                  className="flex-1 px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-red-500 outline-none transition-all text-gray-900 dark:text-gray-100" 
                 />
-                <Calendar 
-                  size={20} 
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none" 
-                />
-                <input 
-                  type="date"
-                  name="joiningDate"
-                  onChange={handleInputChange}
-                  className="absolute right-0 top-0 w-12 h-full opacity-0 cursor-pointer"
-                  title="Open Calendar"
-                />
+                <div className="relative flex items-center justify-center bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" title="Open Calendar">
+                  <Calendar size={24} className="text-red-500" />
+                  <input 
+                    type="date"
+                    name="joiningDate"
+                    value={getSelectedDate(formData.joiningDate)}
+                    onChange={handleInputChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                </div>
               </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Format: Day / Month / Year</p>
             </div>
 
             {/* Membership Type */}
