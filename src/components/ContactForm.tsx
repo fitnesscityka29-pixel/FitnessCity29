@@ -62,8 +62,11 @@ const ContactForm = () => {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
+
+  // Immediately show the congratulations page to the user
+  setIsSubmitted(true);
 
   try {
     // PASTE YOUR NEW GOOGLE DEPLOYMENT URL HERE
@@ -78,20 +81,20 @@ const ContactForm = () => {
     });
     params.append('timestamp', currentDateTime);
 
-    await fetch(scriptURL, {
+    // Fire off the network request in the background without waiting
+    fetch(scriptURL, {
       method: "POST",
       mode: "no-cors", // Keeps it simple for cross-origin requests
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: params.toString(),
+    }).catch(error => {
+      console.error("Error submitting form:", error);
     });
 
-    setIsSubmitted(true);
-    
   } catch (error) {
-    console.error("Error submitting form:", error);
-    setIsSubmitted(true); 
+    console.error("Error setting up form submission:", error);
   }
 };
 
