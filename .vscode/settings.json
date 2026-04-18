@@ -1,3 +1,4 @@
 {
-    "livePreview.hostIP": "192.168.29.250"
+    "livePreview.hostIP": "192.168.29.250",
+    "css.lint.unknownAtRules": "ignore"
 }
